@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Content Creator</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%234F46E5'/%3E%3Cstop offset='.55' stop-color='%237C6FE3'/%3E%3Cstop offset='1' stop-color='%23EC4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3Crect x='6.5' y='9.5' width='17' height='14' rx='3' fill='none' stroke='white' stroke-width='2'/%3E%3Cpath d='M13 13.4v6.2l5-3.1z' fill='white'/%3E%3Cpath d='M25 4.5l1.1 2.4 2.4 1.1-2.4 1.1L25 11.5l-1.1-2.4-2.4-1.1 2.4-1.1z' fill='white'/%3E%3C/svg%3E" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style><!--@include:styles.css--></style>
+    <link rel="stylesheet" href="/static/seedream-studio.css">
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script crossorigin src="/static/react.production.min.js"></script>
+    <script crossorigin src="/static/react-dom.production.min.js"></script>
+    <script src="/static/babel.min.js"></script>
+    <script>
+      const DEBUG_SERVER_URL = window.__DEBUG_SERVER_URL__ || "";
+      function postDebugEvent(payload) {
+        if (!DEBUG_SERVER_URL) return;
+        fetch(DEBUG_SERVER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }).catch(() => {});
+      }
+
+      // #region debug-point A:inline-startup
+      window.addEventListener("error", function (event) {
+        const target = event && event.target;
+        postDebugEvent({
+          sessionId: "empty-ui",
+          runId: "pre-fix",
+          hypothesisId: "A",
+          location: "app.py:inline-startup",
+          msg: "[DEBUG] Empty UI startup error",
+          data: {
+            message: event && event.message ? event.message : "",
+            filename: event && event.filename ? event.filename : "",
+            lineno: event && event.lineno ? event.lineno : 0,
+            colno: event && event.colno ? event.colno : 0,
+            tagName: target && target.tagName ? target.tagName : "",
+            source: target && target.src ? target.src : "",
+          },
+          ts: Date.now(),
+        });
+      }, true);
+      // #endregion
+    </script>
+    <script>
+      // Download names: every file the app saves is "<project name>-<model used>.<ext>".
+      // window.__ccProjectName is kept current by the app (empty outside a project).
+      (function () {
+        var BAD = '/:*?"<>|' + String.fromCharCode(92);
+        var EXT_FIX = { mpeg: "mp3", "x-wav": "wav", wave: "wav", quicktime: "mov", jpeg: "jpg", "svg+xml": "svg", "x-m4a": "m4a", plain: "txt" };
+        function clean(s) {
+          return String(s || "").split("").filter(function (c) { return BAD.indexOf(c) < 0 && c.charCodeAt(0) >= 32; }).join("").replace(/ +/g, " ").trim();
+        }
+        function extOf(url, fallback) {
+          var u = String(url || "");
+          var ext = "";
+          if (u.indexOf("data:") === 0) {
+            var mime = u.slice(5, u.indexOf(";") > 0 ? u.indexOf(";") : u.indexOf(","));
+            ext = (mime.split("/")[1] || "").toLowerCase();
+          } else if (u.indexOf("blob:") !== 0) {
+            var last = u.split("#")[0].split("?")[0].split("/").pop() || "";
+            var dot = last.lastIndexOf(".");
+            ext = dot > 0 ? last.slice(dot + 1).toLowerCase() : "";
+          }
+          ext = EXT_FIX[ext] || ext;
+          if (!ext || ext.length > 5 || !/^[a-z0-9]+$/.test(ext)) ext = String(fallback || "").replace(".", "");
+          return ext;
+        }
+        function downloadName(model, url, fallbackExt) {
+          var project = clean(window.__ccProjectName) || "Content Creator";
+          var ext = extOf(url, fallbackExt);
+          return project + "-" + (clean(model) || "file") + (ext ? "." + ext : "");
+        }
+        function download(url, model, fallbackExt) {
+          if (!url) return;
+          var name = downloadName(model, url, fallbackExt);
+          var a = document.createElement("a");
+          var u = String(url);
+          if (u.indexOf("data:") === 0 || u.indexOf("blob:") === 0) {
+            a.href = u;
+          } else {
+            a.href = "/download?url=" + encodeURIComponent(u) + "&name=" + encodeURIComponent(name);
+          }
+          a.download = name;
+          a.setAttribute("data-cc-raw", "1");
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        }
+        window.ccDownloadName = downloadName;
+        window.ccDownload = download;
+        // Any <a download> in the app is saved the same way; data-model names the model used.
+        document.addEventListener("click", function (e) {
+          var a = e.target && e.target.closest ? e.target.closest("a[download]") : null;
+          if (!a || a.hasAttribute("data-cc-raw")) return;
+          var href = a.getAttribute("href") || "";
+          if (!href || href.indexOf("/download?") === 0) return;
+          e.preventDefault();
+          download(href, a.getAttribute("data-model") || "file", a.getAttribute("data-ext") || "");
+        }, true);
+      })();
+    </script>
+
+    <!-- Seedream 5.0 tools (image generation, layer separation, interactive edit).
+         Loaded before the app script; it only defines window.Seedream* components. -->
+    <script type="text/babel" data-presets="react" src="/static/seedream-studio.jsx"></script>
+    <script type="text/babel" data-presets="react" src="/static/audiobook.jsx"></script>
+    <script type="text/babel" data-presets="react" src="/static/skill-library.jsx"></script>
+    <script type="text/babel" data-presets="react" src="/static/motion-blockout.jsx"></script>
+    <script type="text/babel" data-presets="react" src="/static/video-enhancer.jsx"></script>
+    <script type="text/babel" data-presets="react" src="/static/canvas.jsx"></script>
+    <script type="text/babel" data-presets="react" src="/static/film-tools.jsx"></script>
+    <script type="text/babel" data-presets="react" src="/static/character-sheets.jsx"></script>
+    <script type="text/babel" data-presets="react" src="/static/hybrid-studio.jsx"></script>
+    <script type="text/babel" data-presets="react" src="/static/seed-audio-10.jsx"></script>
+    <script type="text/babel" data-presets="react" src="/static/visual-understanding.jsx"></script>
+    <script type="text/babel" data-presets="react" src="/static/video-editor.jsx"></script>
+    <!-- App code split out of frontend/app.jsx: shared helpers, then one file per tool. Compiled
+         with the same presets as the app script; each defines page-wide globals App uses. -->
+    <script type="text/babel" data-presets="react,env" src="/static/app-common.jsx"></script>
+    <script type="text/babel" data-presets="react,env" src="/static/app-seed-audio.jsx"></script>
+    <script type="text/babel" data-presets="react,env" src="/static/app-blender.jsx"></script>
+    <script type="text/babel" data-presets="react,env" src="/static/app-script-to-prompt.jsx"></script>
+    <script type="text/babel" data-presets="react,env" src="/static/app-character-generation.jsx"></script>
+    <script type="text/babel" data-presets="react,env" src="/static/app-storyboard.jsx"></script>
+    <script type="text/babel" data-presets="react,env" src="/static/app-video-generation.jsx"></script>
+    <script type="text/babel" data-presets="react,env" src="/static/app-long-duration.jsx"></script>
+    <script type="text/babel" data-presets="react,env" src="/static/app-combine-videos.jsx"></script>
+    <script type="text/babel" data-presets="react,env" src="/static/app-audio-black-video.jsx"></script>
+    <script type="text/babel" data-presets="react,env" src="/static/app-skeleton-reference.jsx"></script>
+    <script type="text/babel"><!--@include:app.jsx--></script>
+  </body>
+</html>

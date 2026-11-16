@@ -1,0 +1,4 @@
+interface:
+  display_name: "Seedream"
+  short_description: "Generate, edit, and enhance Seedream image prompts."
+  default_prompt: "Use $seedream to rewrite a rough image brief, execute the Seedream generation command in the terminal, and return the resulting image URLs."

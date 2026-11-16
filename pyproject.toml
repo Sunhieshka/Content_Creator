@@ -1,0 +1,43 @@
+[project]
+name = "content-creator"
+version = "1.0.0"
+description = "Browser-based AI film, ad and audio production studio on BytePlus ModelArk (Seedream, Seedance, Seed Audio, Seed LLM)."
+readme = "README.md"
+requires-python = ">=3.12"
+# Runtime dependencies are pinned in requirements.txt.
+dynamic = ["dependencies"]
+
+[project.optional-dependencies]
+# Tests and lint: pip install -e ".[dev]"
+dev = ["pytest==8.3.5", "ruff==0.11.13"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[tool.setuptools.packages.find]
+include = ["content_creator*"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+# ---------------------------------------------------------------- lint
+[tool.ruff]
+target-version = "py312"
+line-length = 140
+extend-exclude = ["venv", "outputs", "static", ".claude", ".agents", "docs_film_making", "docs_ecommerce"]
+
+[tool.ruff.lint]
+# Correctness-focused rules: real bugs (pyflakes), syntax/IO errors, and import hygiene.
+select = ["E9", "F", "B006", "B008"]
+ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+# Blender scripts run inside Blender, where `bpy` exists.
+"content_creator/services/blender_helpers.py" = ["F821"]
+
+# ---------------------------------------------------------------- tests
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore:urllib3 v2 only supports OpenSSL"]
