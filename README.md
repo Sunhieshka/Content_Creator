@@ -87,10 +87,6 @@ Copy `.env.example` to `.env`. Never commit `.env`.
 | Type | What the project is for |
 |---|---|
 | Short Drama | Scripted, dialogue-led episodes with recurring characters and locations, written as a script and turned into a run of connected shots. |
-| Short Film | A self-contained story told in a few minutes, with one arc, a small cast and a deliberate visual style. |
-| Feature Film | Long-form work built scene by scene: sequences, recurring cast and locations, and continuity across many shots. |
-| Animation | Animated stories in any style (3D, 2D, anime, claymation) with stylised characters and worlds kept consistent from shot to shot. |
-| Music Video | Visuals cut to a song: performance, mood and rhythm-driven shots built around an existing track. |
 | Text Overlay | Videos whose on-screen text (titles, captions, phone or app screens) must be spelled exactly; see below for how it works. |
 | Seed Audio | Audio work on its own or on top of video: voice-overs, dialogue fixes, dubbing, reference-voice cloning, sound effects and music. |
 | Audiobook | A book or document narrated as a full audiobook, exported as MP3 and M4B with chapter markers. |
@@ -98,7 +94,6 @@ Copy `.env.example` to `.env`. Never commit `.env`.
 | Seedream | Still images only: generating, editing and combining images, and splitting them into layers. |
 | Custom | An open project for anything that doesn't fit the types above. |
 
-**Legacy types.** Ad Commercial, Product Catalogue, Social Content, Narrated Fable and Playable Ad are no longer offered for new projects. Existing projects of those types still open, keep their label and filter on the Projects page, and work like a film project. The lists are `PROJECT_TYPES` and `LEGACY_PROJECT_TYPES` in [frontend/app.jsx](frontend/app.jsx).
 
 **Text Overlay** projects change how Video Generation and Long Duration work, so on-screen text is spelled exactly:
 
@@ -356,7 +351,7 @@ Code: [content_creator/services/skills.py](content_creator/services/skills.py), 
 
 | Project type | Skills |
 |---|---|
-| Short Drama, Short Film, Feature Film, Animation, Music Video, Text Overlay, Custom (and the legacy types) | The whole film-making library (below): 17 skills to tick, on top of the always-on Seedance 2.5 Optimizer |
+| Short Drama, Text Overlay, Custom (and the legacy types) | The whole film-making library (below): 17 skills to tick, on top of the always-on Seedance 2.5 Optimizer |
 | Seed Audio, Audiobook | The Seed Audio skills: `seed-audio-prompts`, `seedaudio-prompt-optimizer`, `video-dub-audio-gen` |
 | Hybrid Studio, Seedream | Only the always-on Seedance 2.5 Optimizer (Hybrid Studio); none for Seedream |
 
