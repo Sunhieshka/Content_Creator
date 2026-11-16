@@ -423,7 +423,7 @@ Use **acting-system** for a character's reusable bible across a project or for a
 
 | File | Status | What it does |
 |---|---|---|
-| [hindi-dialogue-phonetics](.claude/skills/hindi-dialogue-phonetics/SKILL.md) | **[live]** `hindi-dialogue-phonetics` | Hindi dialogue → phonetic-only string for TTS and lip-sync. Run it after the dialogue is final. |
+| [hindi-dialogue-phonetics](.claude/skills/hindi-dialogue-phonetics/SKILL.md) | **[live]** `hindi-dialogue-phonetics` | Hindi dialogue → phonetic-only string for lip-sync. |
 
 ### 5. Copyright and compliance
 
