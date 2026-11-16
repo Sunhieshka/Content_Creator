@@ -84,13 +84,21 @@ Copy `.env.example` to `.env`. Never commit `.env`.
 
 **Projects** (sidebar → Projects → New Project) groups work by type. Each project keeps its own drafts, results, asset groups and local files. A type decides which tools a project shows and which skills it offers. `PROJECT_TYPES` and the per-type tool lists are in [frontend/app.jsx](frontend/app.jsx).
 
-| Type | Tools |
+| Type | What the project is for |
 |---|---|
-| Short Drama, Ad Commercial, Product Catalogue, Music Video, Social Content, Text Overlay, Custom | The production pipeline, always in this order: **Script to Prompt → Character Generation → Character Sheets → Location Variations → Storyboard → Previz → Seedream Image Generation → Character Masking → Video Generation → Long Duration → Seed Audio → Video Enhancer**, then Video Editor, Visual Understanding and Canvas |
-| Seedream | Seedream Image Generation, Character Generation, Layer Separation, Interactive Edit |
-| Hybrid Studio | Hybrid Studio |
-| Seed Audio | Seed Audio, Video Generation (to make the videos it dubs). Only Seed Audio 1.0 works while 1.5 is unavailable |
-| Audiobook | Audiobook Creator (opens on creation, runs on Seed Audio 1.0 or 1.5), Seed Audio |
+| Short Drama | Scripted, dialogue-led episodes with recurring characters and locations, written as a script and turned into a run of connected shots. |
+| Short Film | A self-contained story told in a few minutes, with one arc, a small cast and a deliberate visual style. |
+| Feature Film | Long-form work built scene by scene: sequences, recurring cast and locations, and continuity across many shots. |
+| Animation | Animated stories in any style (3D, 2D, anime, claymation) with stylised characters and worlds kept consistent from shot to shot. |
+| Music Video | Visuals cut to a song: performance, mood and rhythm-driven shots built around an existing track. |
+| Text Overlay | Videos whose on-screen text (titles, captions, phone or app screens) must be spelled exactly; see below for how it works. |
+| Seed Audio | Audio work on its own or on top of video: voice-overs, dialogue fixes, dubbing, reference-voice cloning, sound effects and music. |
+| Audiobook | A book or document narrated as a full audiobook, exported as MP3 and M4B with chapter markers. |
+| Hybrid Studio | Moving the people from a green-screen video into a new location, keeping their performance and the camera move. |
+| Seedream | Still images only: generating, editing and combining images, and splitting them into layers. |
+| Custom | An open project for anything that doesn't fit the types above. |
+
+**Legacy types.** Ad Commercial, Product Catalogue, Social Content, Narrated Fable and Playable Ad are no longer offered for new projects. Existing projects of those types still open, keep their label and filter on the Projects page, and work like a film project. The lists are `PROJECT_TYPES` and `LEGACY_PROJECT_TYPES` in [frontend/app.jsx](frontend/app.jsx).
 
 **Text Overlay** projects change how Video Generation and Long Duration work, so on-screen text is spelled exactly:
 
@@ -348,16 +356,15 @@ Code: [content_creator/services/skills.py](content_creator/services/skills.py), 
 
 | Project type | Skills |
 |---|---|
-| Short Drama | The whole film-making library (below) |
-| Ad Commercial, Product Catalogue, Social Content, Music Video | No dedicated skills; the film-making skills fit best |
-| Seed Audio, Audiobook | `seed-audio-prompts` |
-| Custom | Any. `seedream` and `seedance-2-0` are general-purpose |
+| Short Drama, Short Film, Feature Film, Animation, Music Video, Text Overlay, Custom (and the legacy types) | The whole film-making library (below): 17 skills to tick, on top of the always-on Seedance 2.5 Optimizer |
+| Seed Audio, Audiobook | The Seed Audio skills: `seed-audio-prompts`, `seedaudio-prompt-optimizer`, `video-dub-audio-gen` |
+| Hybrid Studio, Seedream | Only the always-on Seedance 2.5 Optimizer (Hybrid Studio); none for Seedream |
 
 ---
 
 ## Film-Making Skill Library
 
-The film-making library has 18 skills covering 8 concerns: scene structure, acting direction, staging, camera language, and Seedance prompt construction. This section maps which file to use and, where two files compete for the same job, which one wins.
+The film-making library covers acting direction, dialogue, camera language, Seedance prompt construction and audio compliance. This section maps which file to use and, where two files compete for the same job, which one wins.
 
 All files are installed under `.claude/skills/` and trigger automatically for Claude Code in this project. Every film-making skill now lives only there (the old `docs_film_making/` copy is gone); the app reads the same files by their library ids.
 
@@ -375,38 +382,19 @@ All files are installed under `.claude/skills/` and trigger automatically for Cl
 | [dialogue-quality-bar](.claude/skills/dialogue-quality-bar/SKILL.md) | Fixes mechanical, "screenplay-thesis" dialogue: a 3-beat confrontation template and 5 diagnostic tests. |
 | [seedance-direct](.claude/skills/seedance-direct/SKILL.md) | Reshapes an existing shot prompt's tone and pacing from one director's note, locking events, image tags and dialogue; outputs JSON. |
 | [hindi-dialogue-phonetics](.claude/skills/hindi-dialogue-phonetics/SKILL.md) | Converts Hindi dialogue into a phonetic-only string for TTS and lip-sync models. |
-| [lira-image-prompts](.claude/skills/lira-image-prompts/SKILL.md) | Prompt router for image generation: Soul 2.0/Cinema, Nano Banana Pro, Seedream 4.5, GPT Image 2. |
 | [seedance-audio-guidelines](.claude/skills/seedance-audio-guidelines/SKILL.md) | Word substitutions and phrasing that keep Seedance 2.0's native audio from being blocked by copyright filters. |
 | [sd25-pe](.claude/skills/sd25-pe/SKILL.md) | Official prompt optimizer for all of Seedance 2.5: text-to-video, multi-reference, keyframes, storyboards, blockouts, editing, extension, audio editing. |
-| [tig-acting-task](.claude/skills/tig-acting-task/SKILL.md) | Tigran's ACTING TASK block: a character's goal, obstacle, motive and tactic written as eye-work for one scene. |
-| [tig-blocking-map](.claude/skills/tig-blocking-map/SKILL.md) | A colour-coded blocking-map diagram plus a connector prompt block for positions and facing, without leaking style into the shot. |
-| [tig-scene-engine](.claude/skills/tig-scene-engine/SKILL.md) | Tigran's 5-element dramatic engine (Goal → Obstacle → Tactic → Reversal → Value Shift) for writing and auditing scenes. |
 
-### 1. Scene structure
+### 1. Performance direction
 
 | File | Status | What it does |
 |---|---|---|
-| [tig-scene-engine](.claude/skills/tig-scene-engine/SKILL.md) | **[live]** `tig-scene-engine` | 5-element engine for writing or auditing scenes and sequences. Custom definitions, not textbook craft. |
-
-The only file that works at story level. Everything below works at prompt level.
-
-### 2. Performance direction
-
-| File | Status | What it does |
-|---|---|---|
-| [tig-acting-task](.claude/skills/tig-acting-task/SKILL.md) | **[live]** `tig-acting-task` | ACTING TASK block: goal, obstacle and tactic in the eyes, one shot at a time. |
 | [acting-system](.claude/skills/acting-system/SKILL.md) | **[live]** `acting-system` | Reusable master character profiles, per-scene adaptation, voice-prompt formula, 0–5 scale. |
 | [dialogue-quality-bar](.claude/skills/dialogue-quality-bar/SKILL.md) | **[live]** `dialogue-quality-bar` | Fixes *what* characters say, not how they perform it. |
 
-Use **tig-acting-task** for the block pasted into one prompt, and **acting-system** for a character's reusable bible across a project or for a "dead-eyed" character. If the problem is the *words*, use **dialogue-quality-bar** first.
+Use **acting-system** for a character's reusable bible across a project or for a "dead-eyed" character. If the problem is the *words*, use **dialogue-quality-bar** first.
 
-### 3. Staging
-
-| File | Status | What it does |
-|---|---|---|
-| [tig-blocking-map](.claude/skills/tig-blocking-map/SKILL.md) | **[live]** `tig-blocking-map` | Tells the video model who is where, without leaking style into the shot. |
-
-### 4. Camera and angle language
+### 2. Camera and angle language
 
 | File | Status | What it does |
 |---|---|---|
@@ -416,7 +404,7 @@ Use **tig-acting-task** for the block pasted into one prompt, and **acting-syste
 
 `camera.md` is the vocabulary. Use `cinematography_skills.md` when the prompt body must not change, and `additional_camera_angle_helpers.md` when iterating on feel. CINEDANCE, sd25_pe and compose/direct each restate camera rules independently.
 
-### 5. Full Seedance shot prompts
+### 3. Full Seedance shot prompts
 
 | File | Status | What it does |
 |---|---|---|
@@ -431,19 +419,13 @@ Use **tig-acting-task** for the block pasted into one prompt, and **acting-syste
 - **Whole script vs. one shot.** A full script goes to `Film_script_to_prompts_skill.md` (2.0) or `sd25-pe` (2.5). One shot from keyframes goes to `compose.md`. A tone or pacing note on an existing prompt goes to `direct.md`.
 - `compose.md` and `direct.md` return JSON that expects a separate step to turn it into a full prompt. No such step exists in this repo, so finish their output into a full prompt by hand.
 
-### 6. Image prompting
-
-| File | Status | What it does |
-|---|---|---|
-| [lira-image-prompts](.claude/skills/lira-image-prompts/SKILL.md) | **[live]** `lira-image-prompts` | Router and prompt builder for still images. |
-
-### 7. Language-specific dialogue
+### 4. Language-specific dialogue
 
 | File | Status | What it does |
 |---|---|---|
 | [hindi-dialogue-phonetics](.claude/skills/hindi-dialogue-phonetics/SKILL.md) | **[live]** `hindi-dialogue-phonetics` | Hindi dialogue → phonetic-only string for TTS and lip-sync. Run it after the dialogue is final. |
 
-### 8. Copyright and compliance
+### 5. Copyright and compliance
 
 | File | Status | What it does |
 |---|---|---|
@@ -451,14 +433,11 @@ Use **tig-acting-task** for the block pasted into one prompt, and **acting-syste
 
 ### Quick decision path
 
-1. Story or scene structure → `tig-scene-engine`.
-2. How a character performs → `tig-acting-task` (one block) or `acting-system` (reusable profile).
-3. What a character says → `dialogue-quality-bar`, then `hindi-dialogue-phonetics` for Hindi TTS.
-4. Where characters stand → `tig-blocking-map`.
-5. Camera language only → §4, by granularity.
-6. Full shot or script → Seedance prompt → §5, by model and scope.
-7. A still image, not video → `lira-image-prompts`.
-8. Native audio getting blocked → `output_audio_sensitivity.md`.
+1. How a character performs → `acting-system`.
+2. What a character says → `dialogue-quality-bar`, then `hindi-dialogue-phonetics` for Hindi TTS.
+3. Camera language only → §2, by granularity.
+4. Full shot or script → Seedance prompt → §3, by model and scope.
+5. Native audio getting blocked → `seedance-audio-guidelines`.
 
 ### Known gaps
 
@@ -479,4 +458,4 @@ These packages in `.claude/skills/` trigger for Claude Code in this project and 
 | [seedream](.claude/skills/seedream/SKILL.md) | Calls Seedream 4.x/5.x to generate, edit and combine images, via a bundled script. |
 | [seedance-2-0](.claude/skills/seedance-2-0/SKILL.md) | Seedance 2.0 prompt design and async generation tasks, via a bundled script. |
 
-`seedream` and `seedance-2-0` call the APIs. `lira-image-prompts` and `sd25-pe` only write prompt text.
+`seedream` and `seedance-2-0` call the APIs. `sd25-pe` only writes prompt text.
